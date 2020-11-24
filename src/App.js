@@ -1,27 +1,33 @@
 import { useEffect, useState } from "react";
 // import logo from './logo.svg';
 import "./App.css";
-import Form  from "./form";
-import  List  from "./List";
+import Form from "./form";
+import List from "./List";
 import { getStates } from "./fakeAPI";
 
 function filterList(list, filter, setList) {
   const tmpList = [];
   debugger;
-  if (filter) {
-    list.filter((item) => {
-      return item ? item.name.indexOf(filter) > -1: false;
-    });
-  }
-  setList(tmpList);
+  const filterList = list.filter((item) => {
+    return item ? item.name.indexOf(filter) > -1 : false;
+  });
+  setList(filter ? filterList : list);
 }
 
-
 function App() {
-  const [list,setList] = useState([]);
-  const [filterData, setFilterData] = useState("");
-  useEffect(()=>{
-    getStates().then(results => setList(results)).catch(error => console.log(error));
+  const [storeList,setStoreList] = useState([]);
+  const [displayList, setDisplayList] = useState([]);
+  const [hasItems, setHasItems] = useState(false);
+  useEffect(() => {
+    if(!hasItems){
+    getStates()
+      .then((results) => {
+        setStoreList(results);
+        setDisplayList(results);
+        setHasItems(true);
+      })
+      .catch((error) => console.log(error));
+    }
   });
 
   return (
@@ -41,8 +47,8 @@ function App() {
         </a>
       </header>
        */}
-      <Form list={list} filterList={filterList} setList={setList}/>
-      {list.lenght>0&&<List listFilter={list||[]} />}
+      <Form list={storeList} filterList={filterList} setList={setDisplayList} />
+      {hasItems && <List listFilter={displayList} />}
     </div>
   );
 }
